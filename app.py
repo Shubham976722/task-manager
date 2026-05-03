@@ -294,6 +294,7 @@ from flask import Flask, render_template, request, redirect, session
 import mysql.connector
 import time
 from datetime import date
+import os
 
 app = Flask(__name__)
 app.secret_key = "mayurbuchkul"
@@ -303,16 +304,17 @@ app.secret_key = "mayurbuchkul"
 def get_db():
     try:
         conn = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="Shubham@1234",
-            database="task_manager_db",
-            port=3306
+            host=os.environ.get("MYSQLHOST"),
+            user=os.environ.get("MYSQLUSER"),
+            password=os.environ.get("MYSQLPASSWORD"),
+            database=os.environ.get("MYSQLDATABASE"),
+            port=int(os.environ.get("MYSQLPORT", 3306))
         )
         return conn
     except Exception as e:
         print("DB Error:", e)
         return None
+
 
 
 # ---------- HOME ----------
