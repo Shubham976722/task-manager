@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f4f6f9;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #1e1e2f;
+            position: fixed;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            color: #ccc;
+            padding: 10px 0;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            color: white;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* STATS (FIXED SMALL CARDS) */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            padding: 20px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0px 6px 18px rgba(0,0,0,0.1);
+        }
+
+        .stat-box h4 {
+            margin: 0;
+            font-size: 14px;
+        }
+
+        .stat-box h2 {
+            margin-top: 10px;
+            font-size: 32px;
+        }
+
+        .blue { background: #2d7ef7; }
+        .green { background: #28a745; }
+
+        /* GRID FOR FORMS */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        /* CARD */
+        .card {
+            background: white;
+            padding: 18px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* INPUTS */
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        /* BUTTON */
+        button {
+            background: #2d7ef7;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #1c5ed6;
+        }
+
+        /* TABLE */
+        .table-card {
+            margin-top: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+        }
+
+        /* STATUS */
+        .status-done { color: green; }
+        .status-pending { color: red; }
+        .status-overdue { color: orange; }
+
+        .badge {
+            background: orange;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+
+        .overdue-row {
+            background: #fff3cd;
+        }
+
+        /* DELETE BUTTON */
+        .delete-btn {
+            background: red;
+            padding: 5px 10px;
+            color: white;
+            border-radius: 5px;
+            border: none;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .stats, .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>Task Manager</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Projects</a>
+    <a href="#">Tasks</a>
+    <a href="/logout">Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <h3>Admin Dashboard</h3>
+        <div>Welcome, <b>{{ username }}</b></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+        <div class="stat-box blue">
+            <h4>Total Members</h4>
+            <h2>{{ members|length }}</h2>
+        </div>
+
+        <div class="stat-box green">
+            <h4>Total Tasks</h4>
+            <h2>{{ tasks|length }}</h2>
+        </div>
+    </div>
+
+    <!-- FORMS GRID -->
+    <div class="grid">
+
+        <!-- CREATE PROJECT -->
+        <div class="card">
+            <h3>Create Project</h3>
+            <form action="/create_project" method="POST">
+                <input type="text" name="name" placeholder="Project Name" required>
+                <textarea name="description" placeholder="Description"></textarea>
+                <button>Create Project</button>
+            </form>
+        </div>
+
+        <!-- CREATE TASK -->
+        <div class="card">
+            <h3>Create Task</h3>
+
+            {% if projects|length == 0 %}
+            <p>No projects available</p>
+            {% elif members|length == 0 %}
+            <p>No members available</p>
+            {% else %}
+            <form action="/create_task" method="POST">
+                <input type="text" name="title" placeholder="Task Title" required>
+
+                <select name="member_id">
+                    {% for member in members %}
+                    <option value="{{ member.id }}">{{ member.username }}</option>
+                    {% endfor %}
+                </select>
+
+                <select name="project_id">
+                    {% for project in projects %}
+                    <option value="{{ project.id }}">{{ project.name }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="date" name="deadline" required>
+
+                <button>Create Task</button>
+            </form>
+            {% endif %}
+        </div>
+
+    </div>
+
+    <!-- TASK TABLE -->
+    <div class="table-card">
+        <h3>All Tasks</h3>
+
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Task</th>
+                <th>Project</th>
+                <th>Assigned</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+            {% for task in tasks %}
+            <tr class="{{ 'overdue-row' if task.overdue else '' }}">
+                <td>{{ loop.index }}</td>
+                <td>
+                    {{ task.title }}
+                    {% if task.overdue %}
+                    <span class="badge">Overdue</span>
+                    {% endif %}
+                </td>
+                <td>{{ task.project_name }}</td>
+                <td>{{ task.assigned_to }}</td>
+                <td>{{ task.deadline }}</td>
+
+                <td>
+                    {% if task.status == 'done' %}
+                    <span class="status-done">Done</span>
+                    {% elif task.overdue %}
+                    <span class="status-overdue">Overdue</span>
+                    {% else %}
+                    <span class="status-pending">Pending</span>
+                    {% endif %}
+                </td>
+
+                <td>
+                    <form action="/delete_task/{{ task.id }}" method="POST">
+                        <button class="delete-btn">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>

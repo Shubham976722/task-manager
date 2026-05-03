@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Member Dashboard</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #f4f6f9;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 220px;
+            height: 100vh;
+            background: #1e1e2f;
+            position: fixed;
+            color: white;
+            padding: 20px;
+        }
+
+        .sidebar h2 {
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            color: #ccc;
+            text-decoration: none;
+        }
+
+        .sidebar a:hover {
+            background: #2d7ef7;
+            color: white;
+        }
+
+        .sidebar a.active {
+            background: #2d7ef7;
+            color: white;
+        }
+
+        .sidebar a.logout {
+            background: #dc3545;
+            color: white;
+            margin-top: 20px;
+        }
+
+        .sidebar a.logout:hover {
+            background: #b02a37;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 240px;
+            padding: 20px;
+        }
+
+        /* TOPBAR */
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* STATS CARDS */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            box-shadow: 0px 4px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-box h4 {
+            margin: 0;
+            font-size: 13px;
+        }
+
+        .stat-box h2 {
+            margin-top: 8px;
+            font-size: 24px;
+        }
+
+        .blue { background: #2d7ef7; }
+        .red { background: #dc3545; }
+        .green { background: #28a745; }
+        .orange { background: #f39c12; }
+
+        /* TABLE CARD */
+        .table-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.08);
+        }
+
+        /* TABLE */
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .task-table th {
+            text-align: left;
+            padding: 12px;
+            background: #f8f9fa;
+            font-size: 14px;
+        }
+
+        .task-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        .task-table tbody tr:hover {
+            background: #f9fbff;
+        }
+
+        /* STATUS BADGES */
+        .status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .status.done {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status.pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status.overdue {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* OVERDUE BADGE */
+        .badge {
+            background: orange;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-left: 5px;
+        }
+
+        /* BUTTON */
+        .done-btn {
+            background: #28a745;
+            border: none;
+            padding: 6px 12px;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .done-btn:hover {
+            background: #218838;
+        }
+
+        .completed-label {
+            background: #ccc;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+        }
+
+        /* OVERDUE ROW */
+        .overdue-row {
+            background: #fff8e1;
+        }
+
+        .empty {
+            text-align: center;
+            color: #888;
+            padding: 20px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>Task Manager</h2>
+
+    <a href="/member" class="active">🏠 Dashboard</a>
+    <a href="#">📝 My Tasks</a>
+
+    <a href="/logout" class="logout">🚪 Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+        <h3>Member Dashboard</h3>
+        <div>Welcome, <b>{{ username }}</b></div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats">
+
+        <div class="stat-box blue">
+            <h4>Total Tasks</h4>
+            <h2>{{ tasks|length }}</h2>
+        </div>
+
+        <div class="stat-box red">
+            <h4>Pending</h4>
+            <h2>
+                {{ tasks | selectattr("status", "equalto", "pending") | list | length }}
+            </h2>
+        </div>
+
+        <div class="stat-box green">
+            <h4>Completed</h4>
+            <h2>
+                {{ tasks | selectattr("status", "equalto", "done") | list | length }}
+            </h2>
+        </div>
+
+        <div class="stat-box orange">
+            <h4>Overdue</h4>
+            <h2>
+                {{ tasks | selectattr("overdue") | list | length }}
+            </h2>
+        </div>
+
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <h3>My Tasks</h3>
+
+        <table class="task-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Task</th>
+                    <th>Project</th>
+                    <th>Deadline</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for task in tasks %}
+                <tr class="{{ 'overdue-row' if task.overdue else '' }}">
+                    <td>{{ loop.index }}</td>
+
+                    <td>
+                        {{ task.title }}
+                        {% if task.overdue %}
+                        <span class="badge">Overdue</span>
+                        {% endif %}
+                    </td>
+
+                    <td>{{ task.project_name }}</td>
+                    <td>{{ task.deadline }}</td>
+
+                    <td>
+                        {% if task.status == 'done' %}
+                            <span class="status done">Done</span>
+                        {% elif task.overdue %}
+                            <span class="status overdue">Overdue</span>
+                        {% else %}
+                            <span class="status pending">Pending</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if task.status != 'done' %}
+                        <form action="/mark_done/{{ task.id }}" method="POST">
+                            <button class="done-btn">✔ Done</button>
+                        </form>
+                        {% else %}
+                            <span class="completed-label">Completed</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+
+                {% if tasks|length == 0 %}
+                <tr>
+                    <td colspan="6" class="empty">No tasks assigned</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
