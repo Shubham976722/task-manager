@@ -303,19 +303,26 @@ app.secret_key = "mayurbuchkul"
 # ---------- DB CONNECTION ----------
 def get_db():
     try:
+        print("HOST:", os.environ.get("MYSQLHOST"))
+        print("USER:", os.environ.get("MYSQLUSER"))
+        print("DB:", os.environ.get("MYSQLDATABASE"))
+        print("PORT:", os.environ.get("MYSQLPORT"))
+
         conn = mysql.connector.connect(
             host=os.environ.get("MYSQLHOST"),
             user=os.environ.get("MYSQLUSER"),
             password=os.environ.get("MYSQLPASSWORD"),
             database=os.environ.get("MYSQLDATABASE"),
-            port=int(os.environ.get("MYSQLPORT", 3306))
+            port=int(os.environ.get("MYSQLPORT", 3306)),
+            connection_timeout=10
         )
+
+        print("✅ DB CONNECTED SUCCESSFULLY")
         return conn
+
     except Exception as e:
-        print("DB Error:", e)
+        print("❌ REAL DB ERROR:", e)
         return None
-
-
 
 # ---------- HOME ----------
 @app.route("/")
